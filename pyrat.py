@@ -118,10 +118,7 @@ def sane(x):
     r=""
     for i in x:
         j = ord(i)
-        if (j < 32) or (j >= 127):
-            r=r+"."
-        else:
-            r=r+i
+        r = f"{r}." if (j < 32) or (j >= 127) else r+i
     return r
 
 def hexdump(x):
@@ -158,7 +155,7 @@ class ConstInstance(int):
         self.__value = value
         self.__name = name
         self.__key = key
-        self.__repr = name+"."+key
+        self.__repr = f"{name}.{key}"
     def __repr__(self):
         return self.__repr
     def __eq__(self, other):
@@ -232,10 +229,9 @@ class Packet:
         clone = self.__class__()
         clone.fields = self.fields.copy()
         clone.payloadinfos = self.payloadinfos
-        if clone.fields.has_key("payload"):
-            if isinstance(clone.payload, Packet):
-                clone.fields["payload"] = clone.payload.copy()
-                clone.payload.add_underlayer(clone)
+        if clone.fields.has_key("payload") and isinstance(clone.payload, Packet):
+            clone.fields["payload"] = clone.payload.copy()
+            clone.payload.add_underlayer(clone)
         clone.update()
         return clone
     def __getattr__(self, attr):
@@ -254,8 +250,8 @@ class Packet:
     def __repr__(self):
         s = ""
         for k in self.fields.keys():
-            s=s+" %s=%s" % (k, repr(self.__getattr__(k)))
-        return "<Packet%s>"% s
+            s = s + f" {k}={repr(self.__getattr__(k))}"
+        return f"<Packet{s}>"
     def __str__(self):
         return self.str
     def __add__(self, other):
